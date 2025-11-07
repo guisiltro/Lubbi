@@ -498,7 +498,76 @@ function initRobotScrollIcon() {
 }
 
 // ===== EVENTOS DE LOGIN E NAVEGAÇÃO =====
+// ===== EVENTOS DE LOGIN E NAVEGAÇÃO =====
 
+// Sistema de Login
+btnLogin.addEventListener('click', function() {
+    const username = document.getElementById('username').value.trim();
+    
+    if (username === '') {
+        showNotification('Por favor, digite seu nome para continuar', 'error');
+        return;
+    }
+    
+    // Salvar informações de login
+    localStorage.setItem('hasLoggedIn', 'true');
+    localStorage.setItem('username', username);
+    localStorage.setItem('loginTime', new Date().toISOString());
+    
+    // Esconder o overlay de login com animação
+    loginContainer.style.opacity = '0';
+    loginContainer.style.transform = 'scale(1.1)';
+    
+    setTimeout(() => {
+        loginContainer.style.display = 'none';
+        showNotification(`Bem-vindo(a), ${username}! Sistema LUBBI inicializado.`, 'success');
+        
+        // Atualizar estatísticas (opcional)
+        updateUserStats(username);
+    }, 500);
+});
+
+// Também permitir login com Enter
+document.getElementById('username').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        btnLogin.click();
+    }
+});
+
+// Função para atualizar estatísticas do usuário (opcional)
+function updateUserStats(username) {
+    // Você pode adicionar lógica aqui para rastrear usuários específicos
+    console.log(`Usuário ${username} acessou o sistema`);
+    
+    // Exemplo: incrementar contador de usuários únicos
+    let uniqueUsers = JSON.parse(localStorage.getItem('uniqueUsers') || '[]');
+    if (!uniqueUsers.includes(username)) {
+        uniqueUsers.push(username);
+        localStorage.setItem('uniqueUsers', JSON.stringify(uniqueUsers));
+    }
+}
+
+// Toggle menu mobile
+navToggle.addEventListener('click', () => {
+    topNav.classList.toggle('active');
+});
+
+// Fechar menu mobile ao clicar em um link
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        topNav.classList.remove('active');
+    });
+});
+
+// Scroll suave para links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e){
+        e.preventDefault();
+        const targetID = this.getAttribute('href').slice(1);
+        const targetElement = document.getElementById(targetID);
+        if(targetElement) targetElement.scrollIntoView({behavior: 'smooth'});
+    });
+});
 
 // Toggle menu mobile
 navToggle.addEventListener('click', () => {
@@ -955,4 +1024,5 @@ dynamicStyles.textContent = `
         color: var(--error-color);
     }
 `;
+
 document.head.appendChild(dynamicStyles);
